@@ -358,42 +358,42 @@ const Countries = {
         
          
     },
-    attack: async (troops: number, countryIDEnemy: number, countryID: number): Promise<exploreResultType> => {
+    // attack: async (troops: number, countryIDEnemy: number, countryID: number): Promise<exploreResultType> => {
 
-        let result: exploreResultType = {
-            allExplores: [],
-            allTurns: []
-        }
+    //     let result: exploreResultType = {
+    //         allExplores: [],
+    //         allTurns: []
+    //     }
 
-        let country = Countries.countriesData.countries[countryID];
-        let countryEnemy = null;
+    //     let country = Countries.countriesData.countries[countryID];
+    //     let countryEnemy = null;
 
-        if(Countries.countriesData.countries[countryIDEnemy] == null){
-            let countryEnemyDB = await Countries.getCountryByID(countryIDEnemy);
-            Countries.setCountrySession(countryIDEnemy, countryEnemyDB);
+    //     if(Countries.countriesData.countries[countryIDEnemy] == null){
+    //         let countryEnemyDB = await Countries.getCountryByID(countryIDEnemy);
+    //         Countries.setCountrySession(countryIDEnemy, countryEnemyDB);
             
-        }
+    //     }
 
-        countryEnemy = Countries.countriesData.countries[countryID];
+    //     countryEnemy = Countries.countriesData.countries[countryID];
 
-        let exploreRate = country.exploreRate;
-        let landExplored = 0;
+    //     let exploreRate = country.exploreRate;
+    //     let landExplored = 0;
 
-        while(turns > 0){
-            let turnUsed = Countries.useTurn(countryID)
-            landExplored = exploreRate;
+    //     while(turns > 0){
+    //         let turnUsed = Countries.useTurn(countryID)
+    //         landExplored = exploreRate;
 
-            result.allExplores.push(landExplored);
-            result.allTurns.push(turnUsed);
-            turns --;
-        }
+    //         result.allExplores.push(landExplored);
+    //         result.allTurns.push(turnUsed);
+    //         turns --;
+    //     }
 
-        country.exploreRate = Countries.computeExploreRate(countryID);
-        console.log('result: ', result);
-        return result;
+    //     country.exploreRate = Countries.computeExploreRate(countryID);
+    //     console.log('result: ', result);
+    //     return result;
         
          
-    }
+    // }
     
     
     
