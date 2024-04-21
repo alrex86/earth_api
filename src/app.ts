@@ -4,6 +4,7 @@ import db from "./config/db";
 import path from "path";
 import userRoutes from "./routes/User";
 import gameRoutes from "./routes/Game";
+import MainRoutes from "./middleware/MainRoutes";
 require("dotenv").config();
 
 const app = express();
@@ -38,6 +39,8 @@ app.get("/", (req, res) => {
 app.post("/api/status", (req, res) => {
   res.send(`${process.env.APP_NAME} is alive!`);
 });
+app.use("/api", MainRoutes.apiRoute);
+
 app.use("/api/user", userRoutes);
 app.use("/api/game", gameRoutes);
 

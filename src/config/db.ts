@@ -29,7 +29,7 @@ const db = {
     });
 
     query =
-      "CREATE TABLE IF NOT EXISTS countries (id INT(11) AUTO_INCREMENT PRIMARY KEY, userid INT(11) NOT NULL, allbuildings VARCHAR(500) NOT NULL, allresearch VARCHAR(500) NOT NULL, land INT(11) NOT NULL, networth INT(11) NOT NULL, cash INT(11) NOT NULL, name VARCHAR(20) NOT NULL)";
+      "CREATE TABLE IF NOT EXISTS countries (id INT(11) AUTO_INCREMENT PRIMARY KEY, userid INT(11) NOT NULL, allbuildings VARCHAR(500) NOT NULL, allresearch VARCHAR(500) NOT NULL, allmilitary VARCHAR(500) NOT NULL, land INT(11) NOT NULL, networth INT(11) NOT NULL, cash INT(11) NOT NULL, name VARCHAR(20) NOT NULL)";
     db.dbData.connection.query(query, (err, result) => {
       if (err) throw err;
     });

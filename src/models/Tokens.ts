@@ -50,11 +50,12 @@ const Tokens = {
             // result(err, null);
           } else {
             // console.log("user res: ", res);
-            // if (res.length > 0) {
-            //   resolve(res[0]);
-            // } else {
-            //   resolve(null);
-            // }
+            let resF = <newTokenType[]>res
+            if (resF.length > 0) {
+              resolve(resF[0]);
+            } else {
+              resolve(null);
+            }
           }
         }
       );
@@ -71,11 +72,12 @@ const Tokens = {
             // result(err, null);
           } else {
             // console.log("user res: ", res);
-            // if (res.length > 0) {
-            //   resolve(res[0]);
-            // } else {
-            //   resolve(null);
-            // }
+            let resF = <newTokenType[]>res
+            if (resF.length > 0) {
+              resolve(resF[0]);
+            } else {
+              resolve(null);
+            }
           }
         }
       );

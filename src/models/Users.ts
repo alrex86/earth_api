@@ -80,12 +80,19 @@ const Users = {
             console.log("error: ", err);
             // result(err, null);
           } else {
-            // console.log("user res: ", res);
-            // if (res.length > 0) {
-            //   resolve(res[0]);
-            // } else {
-            //   resolve(null);
-            // }
+            
+            
+            // console.log("user res: ", result);
+            
+            let resF = <userDBType[]>res;
+
+            // resolve(resF[0]);
+            // console.log('res: ', res1[0]);
+            if (resF.length > 0) {
+              resolve(resF[0]);
+            } else {
+              resolve(null);
+            }
           }
         }
       );
@@ -94,6 +101,8 @@ const Users = {
   initiateUserSession: async (userID: number): Promise<boolean> => {
     let success = true;
     let user = await Users.getUserByUserID(userID);
+    // console.log('user: ', user[0].username);
+    console.log('user: ', user.username);
     if (user != null) {
       Users.usersData.userSessions[userID] = {
         id: user.id,

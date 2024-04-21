@@ -54,6 +54,7 @@ const getUserData = async (req: Request, res: Response) => {
   console.log("req.body: ", req.body);
 
   let response = Miscs.createResponse();
+  console.log('users: ', Users.usersData.userSessions);
   let user = Users.usersData.userSessions[req.body.userID];
   let country = Countries.countriesData.countries[user.countryID];
 

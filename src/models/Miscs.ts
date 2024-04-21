@@ -52,11 +52,14 @@ const Miscs = {
     } else {
       console.log("user session is null");
       result = await Users.initiateUserSession(userData.userID);
+      
       let countryID = await Countries.initiateCountrySession(userData.userID);
+      console.log('country id: ', countryID);
       Users.setCountryID(countryID, userData.userID);
       // let result = await Miscs.apiTokenNull(userData);
       if (result) {
         result = await Miscs.checkTokenSession(userData);
+        console.log('result: ', result);
         // req.body.userID = userData.userID;
         if (!result) {
           success = 0;
@@ -65,7 +68,7 @@ const Miscs = {
         success = 0;
       }
     }
-
+    console.log('success: ', success);
     if (success == 1) {
       req.body.userID = userData.userID;
     }
@@ -76,16 +79,19 @@ const Miscs = {
   },
 
   checkTokenSession: async (userData: userTokenDataType): Promise<boolean> => {
+    console.log('check token session: ');
     let success = true;
     if (Users.usersData.tokenSessions[userData.tokenID] != null) {
+      
       if (
         Users.usersData.tokenSessions[userData.tokenID].token != userData.token
       ) {
         success = false;
       }
     } else {
-      let token = await Tokens.getTokenByTokenID(userData.tokenID);
 
+      let token = await Tokens.getTokenByTokenID(userData.tokenID);
+      
       if (token != null) {
         if (token.token == userData.token) {
           Users.setTokenSession(token.id, token.token, token.userid);

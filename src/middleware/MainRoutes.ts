@@ -1,6 +1,6 @@
 
-import Tokens from "./Tokens"
-import Miscs from "./Miscs"
+import Tokens from "../models/Tokens"
+import Miscs from "../models/Miscs"
 
 
 
@@ -16,6 +16,7 @@ const MainRoutes = {
         if(req.url != '/user/login' && req.url != '/test'){
             let userData = await Tokens.decodeToken(req);
             if(userData != null){
+                console.log('user data: ', userData);
                 if(userData.authority == 1){
 
                 
