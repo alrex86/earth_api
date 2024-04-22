@@ -9,6 +9,16 @@ const query = async (sqlQuery, values) => {
   }
 };
 
+const execute = async (sqlQuery) => {
+  const databaseConnection = await database.initiateDatabaseConnection();
+  try {
+    return await databaseConnection.execute(sqlQuery);
+  } catch (err) {
+    return { error: true, message: err.message };
+  }
+};
+
 module.exports = {
   query,
+  execute,
 };
