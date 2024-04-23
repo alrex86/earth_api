@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS countries
   userid INT(11) NOT NULL, 
   allbuildings VARCHAR(500) NOT NULL, 
   allresearch VARCHAR(500) NOT NULL, 
+  allmilitary VARCHAR(500) NOT NULL, 
   land INT(11) NOT NULL, 
   networth INT(11) NOT NULL, 
   cash INT(11) NOT NULL, 

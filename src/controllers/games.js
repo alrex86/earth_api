@@ -1,4 +1,9 @@
 const Country = require("./../models/countries");
+const {
+  ALL_BUILDINGS,
+  ALL_MILITARY,
+  ALL_RESEARCH,
+} = require("./../common/enums/country");
 
 const createCountry = async (req, res) => {
   const { name, userId } = req.body;
@@ -10,78 +15,16 @@ const createCountry = async (req, res) => {
 
   // check if user has an existing country
   const [rows] = await Country.getCountryByUserId(userId);
-  console.log(rows.length);
   if (rows.length > 0)
     return res.status(400).json({
       error: true,
       message: "Unable to create country. User has an existing one.",
     });
 
-  const allBuildings = {
-    researchLab: {
-      name: "Research Lab",
-      amt: 0,
-    },
-    residential: {
-      name: "Residential",
-      amt: 0,
-    },
-    farm: {
-      name: "Farm",
-      amt: 0,
-    },
-    constructionSite: {
-      name: "Construction Site",
-      amt: 0,
-    },
-    business: {
-      name: "Business",
-      amt: 0,
-    },
-  };
-
-  const allResearch = {
-    military: {
-      name: "Military",
-      amt: 0,
-    },
-    business: {
-      name: "Business",
-      amt: 0,
-    },
-    industrial: {
-      name: "Industrial",
-      amt: 0,
-    },
-  };
-
-  const allMilitary = {
-    troops: {
-      name: "Troops",
-      amt: 0,
-    },
-    tanks: {
-      name: "Tanks",
-      amt: 0,
-    },
-    jets: {
-      name: "Jets",
-      amt: 0,
-    },
-    turrets: {
-      name: "Turrets",
-      amt: 0,
-    },
-    spies: {
-      name: "Spies",
-      amt: 0,
-    },
-  };
-
   const country = {
-    allBuildings: allBuildings,
-    allResearch: allResearch,
-    allMilitary: allMilitary,
+    allBuildings: ALL_BUILDINGS,
+    allResearch: ALL_RESEARCH,
+    allMilitary: ALL_MILITARY,
     land: 0,
     networth: 0,
     population: 0,
@@ -93,17 +36,25 @@ const createCountry = async (req, res) => {
 
   const payload = {
     userid: userId,
-    allbuildings: allBuildings,
-    allresearch: allResearch,
-    allmilitary: allMilitary,
+    allbuildings: JSON.stringify(ALL_BUILDINGS),
+    allresearch: JSON.stringify(ALL_RESEARCH),
+    allmilitary: JSON.stringify(ALL_MILITARY),
     land: country.land,
     networth: country.networth,
     cash: 0,
     name: name,
   };
 
-  // TODO: complete create countries
-  res.json(payload);
+  const createdCountry = await Country.createCountry(payload);
+  if (createCountry.error) {
+    console.log("Country Creation Error: ", createCountry.message);
+    return res.status(500).json({
+      error: true,
+      message: "Unable to create country. Please contact support team.",
+    });
+  }
+
+  res.json(createdCountry);
 };
 
 module.exports = {
