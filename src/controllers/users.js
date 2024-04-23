@@ -53,7 +53,7 @@ function isUsernameSafe(username) {
 }
 
 module.exports = {
-  // login,
+  login,
   getUserData,
   register,
   // getUserById,
