@@ -1,11 +1,11 @@
 const Users = require("./../models/users");
 
-const register = async (req, res, next) => {
+const register = async (req, res) => {
   const { username, password } = req.body;
   const validateUsername = isUsernameSafe(username);
 
   if (validateUsername.error) {
-    return res.status(401).json({ validateUsername });
+    return res.status(400).json({ validateUsername });
   }
 
   const user = await Users.createUser(username, password);
@@ -18,6 +18,12 @@ const register = async (req, res, next) => {
   }
 
   return res.json(user);
+};
+
+const getUserData = async (req, res) => {};
+
+const login = async (req, res) => {
+  const { username, password } = req.body;
 };
 
 function isUsernameSafe(username) {
@@ -48,7 +54,7 @@ function isUsernameSafe(username) {
 
 module.exports = {
   // login,
-  // getUserData,
+  getUserData,
   register,
   // getUserById,
 };
