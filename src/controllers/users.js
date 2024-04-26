@@ -20,10 +20,33 @@ const register = async (req, res) => {
   return res.json(user);
 };
 
-const getUserData = async (req, res) => {};
+const getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  const user = await Users.getUserById(id);
+  if (user.error) {
+    console.log("User Get User Data Error: ", user.message);
+    return res.status(500).json(user);
+  }
+
+  return res.json(user);
+};
 
 const login = async (req, res) => {
   const { username, password } = req.body;
+  const validateUsername = isUsernameSafe(username);
+
+  if (validateUsername.error) {
+    return res.status(400).json({ validateUsername });
+  }
+
+  const user = await Users.login(username, password);
+  if (user.error) {
+    console.log("User Login Error: ", user.message);
+    return res.status(500).json(user);
+  }
+
+  res.json(user);
 };
 
 function isUsernameSafe(username) {
@@ -54,7 +77,6 @@ function isUsernameSafe(username) {
 
 module.exports = {
   login,
-  getUserData,
   register,
-  // getUserById,
+  getUserById,
 };
