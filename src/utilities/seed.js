@@ -28,6 +28,20 @@ CREATE TABLE IF NOT EXISTS tokens
 `,
 });
 
+// create markets table
+sql.push({
+  name: "markets table",
+  query: `
+CREATE TABLE IF NOT EXISTS markets 
+  (id INT(11) AUTO_INCREMENT PRIMARY KEY, 
+  userid INT(11) NOT NULL, 
+  troops INT(11) NOT NULL,
+  tanks INT(11) NOT NULL,
+  jets INT(11) NOT NULL,
+  turrets INT(11) NOT NULL);
+`,
+});
+
 // create countries table
 sql.push({
   name: "countries table",
@@ -41,6 +55,8 @@ CREATE TABLE IF NOT EXISTS countries
   land INT(11) NOT NULL, 
   networth INT(11) NOT NULL, 
   cash INT(11) NOT NULL, 
+  population INT(11) NOT NULL, 
+  turns INT(11) NOT NULL, 
   name VARCHAR(20) NOT NULL);
 `,
 });

@@ -1,4 +1,6 @@
 const Country = require("./../models/countries");
+const User = require("./../models/users");
+
 const {
   ALL_BUILDINGS,
   ALL_MILITARY,
@@ -7,7 +9,7 @@ const {
 
 const createCountry = async (req, res) => {
   const { name, userId } = req.body;
-  if (!name || !userId)
+  if (!name)
     return res.status(400).json({
       error: true,
       message: "Invalid request. Please supply missing id and name.",
@@ -28,7 +30,7 @@ const createCountry = async (req, res) => {
     land: 0,
     networth: 0,
     population: 0,
-    cash: 0,
+    cash: 10000,
     name: name,
     exploredLand: 0,
     exploreRate: 50,
@@ -41,7 +43,8 @@ const createCountry = async (req, res) => {
     allmilitary: JSON.stringify(ALL_MILITARY),
     land: country.land,
     networth: country.networth,
-    cash: 0,
+    cash: country.cash,
+    population: country.population,
     name: name,
   };
 
@@ -57,6 +60,78 @@ const createCountry = async (req, res) => {
   res.json(createdCountry);
 };
 
+const build = async (req, res) => {
+  const { amtsStr, userId } = req.body;
+
+  
+
+  
+  
+  if(!amtsStr)
+    return res.status(400).json({
+      error: true,
+      message: "Invalid request. Please supply missing fields.",
+    });
+  try {
+    const amts = JSON.parse(amtsStr);
+    console.log('amts: ', amts);
+    if(amts.farm == null || amts.business == null){
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request. Invalid amts.",
+      });  
+    }
+
+    let totalAmt = 0;
+    for(amt in amts){
+      amts[amt] = parseInt(amts[amt]);
+      if(amts[amt] == NaN){
+        amts[amt] = 0;
+        
+      } 
+
+      totalAmt = totalAmt + amts[amt];
+      
+    }
+
+    if(totalAmt == 0){
+      return res.status(400).json({
+        error: true,
+        message: "No buildings to build.",
+      }); 
+    }
+    // console.log('business amt: ', parseInt(amts.business));
+    // if(farmAmt == 0 && businessAmt == 0 && reasearchLabAmt == 0){
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: "No building to build.",
+    //   }); 
+    // }
+    
+    // let amts = {
+    //   farm: farmAmt,
+    //   business: businessAmt,
+    //   researchLab: reasearchLabAmt
+    // }
+  
+    let buildRes = Country.build(amts, User.sessions[userId].countryId);
+    
+    
+    console.log('build res:', buildRes);
+  
+    res.json(buildRes);
+  } catch (error) {
+    console.log('error: ', error);
+    return res.status(400).json({
+      error: true,
+      message: "Wrong object",
+    }); 
+  }
+
+  
+};
+
 module.exports = {
   createCountry,
+  build
 };
