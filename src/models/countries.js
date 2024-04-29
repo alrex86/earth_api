@@ -1,8 +1,12 @@
 const db = require("../common/db-helper");
 
 const Country = {
+<<<<<<< HEAD
   sessions: {},
   buildingCost: 5000,
+=======
+  session: [],
+>>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
   createCountry: async (payload) => {
     try {
       return await db.query("INSERT INTO countries set ?", payload);
@@ -14,13 +18,21 @@ const Country = {
     const payload = {
       userId,
     };
+<<<<<<< HEAD
   
     try {
       return await db.query("SELECT * FROM countries WHERE ?", payload);
+=======
+
+    try {
+      const [rows] = await db.query("SELECT * FROM countries WHERE ?", payload);
+      return rows;
+>>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
     } catch (err) {
       return { error: true, message: err.message };
     }
   },
+<<<<<<< HEAD
   useTurn: (countryID) => {
     
 
@@ -338,3 +350,8 @@ const Country = {
 
 module.exports = Country;
 
+=======
+};
+
+module.exports = Country;
+>>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
