@@ -2,6 +2,8 @@ require("dotenv").config();
 const Tokens = require("./../models/tokens");
 const Users = require("./../models/users");
 const Countries = require("./../models/countries");
+const Markets = require("./../models/markets");
+const jwt = require('jsonwebtoken');
 
 const randomStr = (length) => {
 	let result           = '';
@@ -21,24 +23,32 @@ const getTime = () => {
 
 const delayTime = (time) => {
     
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log('delay');
-            resolve();
-        }, time * 1000)
-    })
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			console.log('delay');
+			resolve();
+		}, time * 1000)
+	})
 }
 
-const apiMiddleware = async (req, res, next) => {
+const api = async (req, res, next) => {
 	console.log('req.url: ', req.url);
 	if(req.url == '/users/register' || req.url == '/users/login' || req.url == '/users/getUserData'){
 		next();
 		return
 	}
 
-	console.log('req headers: ', req.headers);
-	let {userId, token, tokenId} = JSON.parse(req.headers['x-access-token']);
-	console.log('token: ', token);
+	// console.log('req headers: ', req.headers);
+	// let {userId, token, tokenId} = JSON.parse(req.headers['x-access-token']);
+	const decodedData = await decodeToken(req.headers['x-access-token']);
+	if(decodedData.error){
+		return res.status(500).json({
+			error: true,
+			message: "Decode token error.",
+		});	
+	}
+	console.log('decoded data: ', decodedData);
+	const {userId, token, tokenId} = decodedData.userData;
 	// if(process.env.NODE_ENV == 'dev'){
 		
 				
@@ -56,6 +66,7 @@ const apiMiddleware = async (req, res, next) => {
 		}
 		
 		const tokens = tokenRes[0];
+		console.log('token res: ', tokenRes);
 		// Check if token exist
 		if(tokens.length == 0){
 			
@@ -137,10 +148,79 @@ const apiMiddleware = async (req, res, next) => {
 	
 }
 
+const apiMiddleware = async (req, res, next) => {
+	Users.requestCount ++;
+	await api(req, res, next)
+	Users.requestCount --;
+}
+
+const decodeToken = async (token) => {
+	
+	
+	if (!token) {
+		return {
+			error: true,
+			message: 'Token is null.'
+		}			
+	}
+
+	console.log("xheaders: ", token);
+	let data = await verifyToken(token, process.env.TOKEN_SECRET);
+	if(data.error){
+		return {
+			error: true,
+			message: data.error.message
+		}
+	}
+
+	
+	return data;
+}
+
+const verifyToken = (token, secret) => {
+	return new Promise((resolve, reject) => {
+		jwt.verify(token, secret, (err, decodedData) => {
+			if (err) {
+				// resolve({status: 0, payload: err});
+				// callback(err, null);
+				console.log("err: ", err);
+				resolve({error: true, message: err});
+			} else {
+				// console.log('decoded data: ', decodedData);
+				// resolve({status: 1, payload: decodedData});
+				resolve(decodedData);
+			}
+		});
+	});
+}
+
+const initiateMarket = async () => {
+	const goodsAvail = Markets.goodsAvail;
+	initateMarketItem('troops');
+	initateMarketItem('tanks');
+	
+	
+}
+
+const initateMarketItem = async (itemName) => {
+	const itemsRes = await Markets.getLowestPriceByItem(itemName);
+	if(!itemsRes.error){
+		const items = itemsRes[0];
+		if(items.length > 0){
+			const item = items[0];
+			goodsAvail[itemName].amt = item[itemName];
+			goodsAvail[itemName].price = item[itemName + 'price'];
+			goodsAvail[itemName].marketId = item.id;
+		}
+		
+	}
+}
+
 
 module.exports = {
 	getTime,
 	randomStr,
 	apiMiddleware,
-	delayTime
+	delayTime,
+	initiateMarket
 };

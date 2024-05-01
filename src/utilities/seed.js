@@ -12,7 +12,7 @@ sql.push({
 CREATE TABLE IF NOT EXISTS users 
   (id INT(11) AUTO_INCREMENT PRIMARY KEY, 
   username VARCHAR(16) NOT NULL UNIQUE, 
-  password VARCHAR(100) NOT NULL, 
+  password VARCHAR(300) NOT NULL, 
   bidbal INT(11) NOT NULL);
 `,
 });
@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS markets
   troops INT(11) NOT NULL,
   tanks INT(11) NOT NULL,
   jets INT(11) NOT NULL,
-  turrets INT(11) NOT NULL);
+  turrets INT(11) NOT NULL,
+  troopsprice INT(11) NOT NULL,
+  tanksprice INT(11) NOT NULL);
 `,
 });
 

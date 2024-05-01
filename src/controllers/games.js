@@ -131,7 +131,183 @@ const build = async (req, res) => {
   
 };
 
+const sell = async (req, res) => {
+  const { amtsAndPricesStr, userId } = req.body;
+
+  
+
+  
+  
+  if(!amtsAndPricesStr)
+    return res.status(400).json({
+      error: true,
+      message: "Invalid request. Please supply missing fields.",
+    });
+  try {
+
+    const amtsAndPrices = JSON.parse(amtsAndPricesStr);
+    if(amtsAndPrices.amts == null || amtsAndPrices.prices == null){
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request. Invalid inputs.",
+      });  
+    }
+
+    const amts = amtsAndPrices.amts;
+    console.log('amts: ', amts);
+    if(amts.farm == null || amts.business == null){
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request. Invalid amts.",
+      });  
+    }
+
+    let totalAmt = 0;
+    for(amt in amts){
+      amts[amt] = parseInt(amts[amt]);
+      if(amts[amt] == NaN){
+        amts[amt] = 0;
+        
+      } 
+
+      totalAmt = totalAmt + amts[amt];
+      
+    }
+
+    if(totalAmt == 0){
+      return res.status(400).json({
+        error: true,
+        message: "No goods or tech to sell.",
+      }); 
+    }
+    
+    const prices = amtsAndPrices.prices;
+    if(prices.farm == null || prices.business == null){
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request. Invalid amts.",
+      });  
+    }
+
+    for(price in prices){
+      prices[price] = parseInt(prices[price]);
+      if(prices[price] == NaN){
+        prices[price] = 0;
+        
+      } 
+
+      
+      
+    }
+    
+  
+    let buildRes = Country.build(amts, User.sessions[userId].countryId);
+    
+    
+    console.log('build res:', buildRes);
+  
+    res.json(buildRes);
+  } catch (error) {
+    console.log('error: ', error);
+    return res.status(400).json({
+      error: true,
+      message: "Wrong object",
+    }); 
+  }
+
+  
+};
+
+const buy = async (req, res) => {
+  const { amtsAndPricesStr, userId } = req.body;
+
+  
+
+  
+  
+  if(!amtsAndPricesStr)
+    return res.status(400).json({
+      error: true,
+      message: "Invalid request. Please supply missing fields.",
+    });
+  try {
+
+    const amtsAndPrices = JSON.parse(amtsAndPricesStr);
+    if(amtsAndPrices.amts == null || amtsAndPrices.prices == null){
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request. Invalid inputs.",
+      });  
+    }
+
+    const amts = amtsAndPrices.amts;
+    console.log('amts: ', amts);
+    if(amts.farm == null || amts.business == null){
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request. Invalid amts.",
+      });  
+    }
+
+    let totalAmt = 0;
+    for(amt in amts){
+      amts[amt] = parseInt(amts[amt]);
+      if(amts[amt] == NaN){
+        amts[amt] = 0;
+        
+      } 
+
+      totalAmt = totalAmt + amts[amt];
+      
+    }
+
+    if(totalAmt == 0){
+      return res.status(400).json({
+        error: true,
+        message: "No goods or tech to buy.",
+      }); 
+    }
+    
+    const prices = amtsAndPrices.prices;
+    if(prices.farm == null || prices.business == null){
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request. Invalid amts.",
+      });  
+    }
+
+    for(price in prices){
+      prices[price] = parseInt(prices[price]);
+      if(prices[price] == NaN){
+        prices[price] = 0;
+        
+      } 
+
+      
+      
+    }
+    
+    
+    let buildRes = Country.build(amts, User.sessions[userId].countryId);
+    
+    
+    console.log('build res:', buildRes);
+  
+    res.json(buildRes);
+  } catch (error) {
+    console.log('error: ', error);
+    return res.status(400).json({
+      error: true,
+      message: "Wrong object",
+    }); 
+  }
+
+  
+};
+
 module.exports = {
   createCountry,
-  build
+  build,
+  sell,
+  buy
 };

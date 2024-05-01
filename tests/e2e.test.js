@@ -1,5 +1,6 @@
+require("dotenv").config();
 const request = require("supertest");
-
+const jwt = require('jsonwebtoken');
 const server = require("./../src/server");
 const dbHelper = require("../src/utilities/initialize-tables");
 
@@ -11,6 +12,18 @@ beforeAll(async () => {
   await dbHelper.setValuesCountries();
 });
 
+let userData = {
+  userId: 3,
+  
+  username: 'user3',
+  
+  token: 'hehey',
+  tokenId: 3,
+  country: 5,
+  
+} 
+
+let jwtToken = jwt.sign({userData: userData}, process.env.TOKEN_SECRET, {noTimestamp : true});
 // describe("Users API", () => {
 //   describe("Successful registration", () => {
 //     it("POST /register", async () => {
@@ -98,18 +111,18 @@ describe("Users API", () => {
   });
 });
 
-// describe("Games API", () => {
-//   describe("Successful country creation", () => {
-//     it("POST /country/create", async () => {
-//       const response = await request(server)
-//         .post("/api/game/country/create")
-//         .set('x-access-token', JSON.stringify({userId: 1, token: 'hayss', tokenId: 1}))
-//         .send({ name: "my country" });
-//       console.log('responsse: ', response.error);
-//       expect(response.status).toBe(200);
-//     });
-//   });
-// });
+describe("Games API", () => {
+  describe("Successful country creation", () => {
+    it("POST /country/create", async () => {
+      const response = await request(server)
+        .post("/api/game/country/create")
+        .set('x-access-token', jwtToken)
+        .send({ name: "my country" });
+      console.log('responsse: ', response.error);
+      expect(response.status).toBe(200);
+    });
+  });
+});
 
 // describe("Games API", () => {
 //   describe("User already has a country", () => {

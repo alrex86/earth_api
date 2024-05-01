@@ -4,6 +4,7 @@ const Users = require("./../models/users");
 const Tokens = require("./../models/tokens");
 const otherHelper = require("./../common/other-helper");
 const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
 const Countries = require("../models/countries");
 
 const register = async (req, res) => {
@@ -14,7 +15,14 @@ const register = async (req, res) => {
     return res.status(400).json({ validateUsername });
   }
 
-  const user = await Users.createUser(username, password);
+  
+  const salt = await bcrypt.genSalt(10);
+  if(process.env.NODE_ENV == 'test'){
+    
+    salt = 'hehey'; 
+  }
+  let encryptedPassword = await bcrypt.hash(password, salt);
+  const user = await Users.createUser(username, encryptedPassword);
   if (user.error) {
     console.log("User Registration Error: ", user.message);
     return res.status(500).json({
@@ -29,6 +37,7 @@ const register = async (req, res) => {
 const getUserData = async (req, res) => {
   console.log('get user data');
 }
+
 const getUserById = async (req, res) => {
   const { id } = req.params;
 
@@ -75,12 +84,19 @@ const login = async (req, res) => {
   const user = users[0];
   console.log('password: ', password);
   console.log('password db: ', user.password);
-  if(user.password != password){
-    return res.status(500).json({
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch)
+    return {
       error: true,
-      message: "Incorrect password.",
-    }); 
-  }
+      message: "Either username or password is incorrect.",
+    };
+  // if(user.password != password){
+  //   return res.status(500).json({
+  //     error: true,
+  //     message: "Incorrect password.",
+  //   }); 
+  // }
 
   let countryRes = await Countries.getCountryByUserId(user.id);
   if (countryRes.error) {
@@ -93,10 +109,13 @@ const login = async (req, res) => {
   
   const countries = countryRes[0];
   
-  let tokenStr = otherHelper.randomStr(5);  
+  let tokenStr = otherHelper.randomStr(5);
+  
   if(process.env.NODE_ENV == 'test'){
+    
     tokenStr = 'hehey'; 
   }
+
   const tokenRes = await Tokens.createToken(tokenStr, user.id);
   // Check if theres token save error
   if(tokenRes.error){
@@ -110,6 +129,8 @@ const login = async (req, res) => {
   console.log('token str: ', tokenRes);
   Tokens.initiateSession(tokenStr, user.id, tokenRes[0].insertId);
   Users.initiateSession(user.id, user.username);
+  
+  let countryData = null;
   if(countries.length > 0){
     const country = countries[0];
     if(Countries.sessions[country.id] == null){
@@ -124,6 +145,8 @@ const login = async (req, res) => {
         JSON.parse(country.allmilitary)
       )
     }
+
+    countryData = Countries.sessions[country.id];
     
   }
 
@@ -142,7 +165,7 @@ const login = async (req, res) => {
 
   let jwtToken = jwt.sign({userData: userData}, process.env.TOKEN_SECRET, {noTimestamp : true});
   
-  return res.json({token: jwtToken, userData: Users.sessions[user.id]});
+  return res.json({token: jwtToken, userData: Users.sessions[user.id], countryData: countryData});
   
   
 };
@@ -194,4 +217,5 @@ module.exports = {
   login,
   register,
   getUserById,
+  getUserData
 };

@@ -1,12 +1,9 @@
 const db = require("../common/db-helper");
+const Market = require("./markets");
 
 const Country = {
-<<<<<<< HEAD
   sessions: {},
   buildingCost: 5000,
-=======
-  session: [],
->>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
   createCountry: async (payload) => {
     try {
       return await db.query("INSERT INTO countries set ?", payload);
@@ -18,21 +15,13 @@ const Country = {
     const payload = {
       userId,
     };
-<<<<<<< HEAD
   
     try {
       return await db.query("SELECT * FROM countries WHERE ?", payload);
-=======
-
-    try {
-      const [rows] = await db.query("SELECT * FROM countries WHERE ?", payload);
-      return rows;
->>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
     } catch (err) {
       return { error: true, message: err.message };
     }
   },
-<<<<<<< HEAD
   useTurn: (countryID) => {
     
 
@@ -269,9 +258,14 @@ const Country = {
     return buildingsOrResearchPerTurn;
 
   },
-  sell: (amts, countryID, createMarket) => {
+  sell: async (amts, countryID, prices, createMarket) => {
+
+    let allTurns = [];
     let turnsToUse = 2;
     let continueUsingTurns = true;
+
+    let country = Country.sessions[countryID];
+
     while(turnsToUse != 0 && continueUsingTurns){
       let turnUsed = Country.useTurn(countryID);
       if(turnUsed != null){
@@ -292,30 +286,112 @@ const Country = {
     }
 
     if(turnsToUse == 0){
+      Country.sellGoodsOrTech(amts, amtToSell, 'military', 'troops', countryID);
+      
+      const createMarketRes = await createMarket(userID, amtToSell.troops, amtToSell.jets, amtToSell.tanks, amtToSell.turrets) 
+      if(!createMarketRes.error){
+        country.allMilitary.troops.amt = country.allMilitary.troops.amt - amtToSell.troops;
+        country.allMilitary.tanks.amt = country.allMilitary.tanks.amt - amtToSell.tanks;   
+        country.allMilitary.jets.amt = country.allMilitary.jets.amt - amtToSell.jets;
+        country.allMilitary.turrets.amt = country.allMilitary.turrets.amt - amtToSell.turrets;
+      }else{
+        for(amtName in amtToSell){
+          amtToSell[amtName] = 0;
+          
+          
+        }
+      }
+    }
 
+    
+
+    return {
+      amtToSell,
+      allTurns
     }
   },
   sellGoodsOrTech: (amts, amtToSell, goodsOrTechType, goodsOrTechName, countryID) => {
     const country = Country.sessions[countryID];
-    const goodsOrTechObj = null;
+    
     let maxAmt = 0;
     if(goodsOrTechType == 'military'){
-      goodsOrTechObj = country.allMilitary
-      maxAmt = goodsOrTechObj[goodsOrTechName].amt;
+      
+      maxAmt = country.allMilitary[goodsOrTechName].amt;
     }else if(goodsOrTechType == 'tech'){
-      goodsOrTechObj = country.allResearch;
-      maxAmt = goodsOrTechObj[goodsOrTechName].amt;
+      
+      maxAmt = country.allResearch[goodsOrTechName].amt;
     }else{
-      goodsOrTechObj = country;
-      maxAmt = goodsOrTechObj[goodsOrTechName];
+      
+      maxAmt = country[goodsOrTechName];
     }
 
 
      
-    if(amts[goodsOrTechName] <= goodsOrTechObj[goodsOrTechName].amt){
+    if(amts[goodsOrTechName] <= maxAmt){
       amtToSell[goodsOrTechName] = amts[goodsOrTechName];
     }else{
-      amtToSell[goodsOrTechName] = goodsOrTechObj[goodsOrTechName].amt 
+      amtToSell[goodsOrTechName] = maxAmt 
+    }
+
+    
+  },
+  buy: (amts, prices, countryID) => {
+    // const country = Country.sessions[countryID];
+    // const goodsAvail = Market.goodsAvail;
+    const goodsBought = {
+      troops: 0,
+      tanks: 0,
+      jets: 0
+    }
+
+    Country.buyGoodsOrTech(amts, prices, goodsBought, 'troops', 'military', countryID);
+    Country.buyGoodsOrTech(amts, prices, goodsBought, 'tanks', 'military', countryID)
+    // let maxAmt = amts.troops;
+    // if(prices.troops == goodsAvail.troops.price){
+    //   if(goodsAvail.troops.amt < amts.troops){
+    //     maxAmt = goodsAvail.troops.amt;
+    //   }
+    //   if(country.cash < maxAmt * prices.troops){
+    //     maxAmt = Math.floor(country.cash / prices.troops)
+    //   }
+
+    //   country.cash = country.cash - maxAmt * prices.troops
+    //   country.allMilitary.troops.amt = country.allMilitary.troops.amt + maxAmt;
+    //   goodsBought.troops = maxAmt
+    // }
+    
+
+  },
+  buyGoodsOrTech: (amts, prices, goodsBought, GTName, GTType, countryID) => {
+
+    const goodsAvail = Market.goodsAvail;
+    const country = Countries.sessions[countryID];
+    
+
+    if(prices[GTName] == goodsAvail[GTName].price){
+
+      let maxAmt = amts[GTName];
+      if(goodsAvail[GTName].amt < maxAmt){
+        maxAmt = goodsAvail[GTName].amt;
+      }
+      if(country.cash < maxAmt * prices[GTName]){
+        maxAmt = Math.floor(country.cash / prices[GTName])
+      }
+
+      country.cash = country.cash - maxAmt * prices[GTName];
+      if(GTType == 'military'){
+        country.allMilitary[GTName].amt = country.allMilitary[GTName].amt + maxAmt;
+      }else if(GTType == 'tech'){
+        country.allResearch[GTName].amt = country.allResearch[GTName].amt + maxAmt;  
+      }else{
+        country[GTName] = country[GTName] + maxAmt;  
+      }
+
+      goodsAvail[GTName].amt = goodsAvail[GTName].amt - maxAmt;
+      if(goodsAvail[GTName].amt == 0){
+        Market.replenishItem(GTName);  
+      }
+      goodsBought[GTName] = maxAmt;
     }
   },
   initiateSession: (
@@ -350,8 +426,3 @@ const Country = {
 
 module.exports = Country;
 
-=======
-};
-
-module.exports = Country;
->>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94

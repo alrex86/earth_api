@@ -1,6 +1,6 @@
 require("dotenv").config();
 const db = require("../common/db-helper");
-
+const bcrypt = require("bcrypt");
 const {
   ALL_BUILDINGS,
   ALL_MILITARY,
@@ -60,31 +60,28 @@ const resetIds = async () => {
 }
 
 const setValuesUsers = async () => {
+  const salt = await bcrypt.genSalt(10);
+  let encryptedPassword = await bcrypt.hash('hayss', salt);
   const sql = [];
   sql.push({
     name: "user table",
     query: "INSERT INTO users SET ?",
-    value: {username: 'user1', password: 'hayss'}
+    value: {username: 'user1', password: encryptedPassword}
   });
 
   sql.push({
     name: "tokens table",
     query: "INSERT INTO users SET ?",
-    value: {username: 'user2', password: 'hayss'}
+    value: {username: 'user2', password: encryptedPassword}
   });
 
   sql.push({
     name: "countries table",
     query: "INSERT INTO users SET ?",
-    value: {username: 'user3', password: 'hayss'}
+    value: {username: 'user3', password: encryptedPassword}
   });
 
-  sql.push({
-    name: "countries table",
-    query: "INSERT INTO tokens SET ?",
-    value: {userid: 1, token: 'hayss'}
-  });
-
+  
   for (const seed of sql) {
     try {
       seed.value.bidbal = 0;
@@ -129,7 +126,7 @@ const setValuesCountries = async () => {
     
     query: "INSERT INTO countries SET ?",
     value: {
-      userid: 3,
+      userid: 5,
       allbuildings: JSON.stringify(ALL_BUILDINGS),
       allresearch: JSON.stringify(ALL_RESEARCH),
       allmilitary: JSON.stringify(ALL_MILITARY),

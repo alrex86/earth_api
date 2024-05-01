@@ -5,14 +5,14 @@ const Country = require("./countries");
 
 const User = {
   sessions: {},
+  requestCount: 0,
   createUser: async (username, password) => {
     const payload = {
       username,
       password,
       bidbal: 0,
     };
-    const salt = await bcrypt.genSalt(10);
-    payload.password = await bcrypt.hash(password, salt);
+    
 
     try {
       return await db.query("INSERT INTO users set ?", payload);
@@ -28,7 +28,6 @@ const User = {
       return { error: true, message: err.message };
     }
   },
-<<<<<<< HEAD
   getUserByUsername: async (username) => {
     const payload = [
       username,
@@ -36,7 +35,10 @@ const User = {
   
     try {
       return await db.query("SELECT * FROM users WHERE username = ?", payload);
-=======
+      } catch (err) {
+      return { error: true, message: err.message };
+    }
+  },
   login: async (username, password) => {
     try {
       const payload = {
@@ -77,12 +79,10 @@ const User = {
       console.log("country session: ", Country.session);
 
       return { accessToken: token };
->>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
     } catch (err) {
       return { error: true, message: err.message };
     }
   },
-<<<<<<< HEAD
   getUserById: async (Id) => {
     const payload = [
       Id,
@@ -90,8 +90,11 @@ const User = {
   
     try {
       return await db.query("SELECT * FROM users WHERE id = ?", payload);
-=======
-  getUserById: async (id) => {
+      } catch (err) {
+      return { error: true, message: err.message };
+    }
+  },
+  getUserById2: async (id) => {
     const payload = { "u.id": id };
     try {
       const [rows] = await db.query(
@@ -109,12 +112,10 @@ const User = {
       user.password = undefined;
 
       return user;
->>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
     } catch (err) {
       return { error: true, message: err.message };
     }
   },
-<<<<<<< HEAD
   initiateSession: (userID, username) => {
     User.sessions[userID] = {
       userID: userID,
@@ -123,9 +124,7 @@ const User = {
     }
     
   },
-  login: async (username, password) => {},
-=======
->>>>>>> e6d0a0227786bdd98046e4e2cddc7df8b7bf6d94
+  login2: async (username, password) => {},
 };
 
 module.exports = User;

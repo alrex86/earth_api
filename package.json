@@ -6,10 +6,11 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon",
+    "dev2": "SET DB_DATABASE=earth_test&nodemon",
     "seed": "node src/utilities/seed.js",
     "test": "DB_DATABASE=earth_test jest --watchAll",
     "seed-test": "DB_DATABASE=earth_test node src/utilities/seed.js",
-    "test-w": "SET DB_DATABASE=earth_test&jest --watchAll",
+    "test-w": "SET DB_DATABASE=earth_test&SET NODE_ENV=test&jest --watchAll",
     "seed-test-w": "SET DB_DATABASE=earth_test&node src/utilities/seed.js"
   },
   "author": "John Cyruss Morales",
