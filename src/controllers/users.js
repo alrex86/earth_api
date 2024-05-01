@@ -17,10 +17,7 @@ const register = async (req, res) => {
 
   
   const salt = await bcrypt.genSalt(10);
-  if(process.env.NODE_ENV == 'test'){
-    
-    salt = 'hehey'; 
-  }
+  
   let encryptedPassword = await bcrypt.hash(password, salt);
   const user = await Users.createUser(username, encryptedPassword);
   if (user.error) {
